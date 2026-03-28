@@ -1,0 +1,43 @@
+{
+  "name": "replit-proxy",
+  "version": "1.0.0",
+  "description": "OpenAI-compatible proxy server for Ollama",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "tsx test/basic.test.ts",
+    "test:vision": "tsx test/vision.test.ts",
+    "test:streaming": "tsx test/streaming.test.ts",
+    "test:ratelimit": "tsx test/rateLimit.test.ts",
+    "test:load": "tsx test/loadTest.ts",
+    "test:load:streaming": "tsx test/streamingLoadTest.ts",
+    "test:queue": "tsx test/queueTest.ts",
+    "test:queue:fairness": "tsx test/queueFairnessTest.ts",
+    "test:unit": "tsx src/services/__tests__/proxy.test.ts && tsx src/types/__tests__/api.test.ts",
+    "test:massive": "tsx test/massiveScaleTest.ts",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\""
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "eventsource-parser": "^3.0.6",
+    "express": "^4.21.0",
+    "ioredis": "^5.4.1",
+    "p-queue": "^9.1.0",
+    "rate-limiter-flexible": "^5.0.0",
+    "uuid": "^10.0.0",
+    "winston": "^3.19.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@types/uuid": "^10.0.0",
+    "@typescript/native-preview": "^7.0.0-dev.20260328.1",
+    "openai": "^4.70.0",
+    "prettier": "^3.8.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

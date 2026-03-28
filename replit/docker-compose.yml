@@ -1,0 +1,29 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - OLLAMA_URL=http://host.docker.internal:11434
+      # - OLLAMA_URL=http://host.docker.internal:11435
+      - PORT=8000
+      - OLLAMA_CONCURRENCY=10
+      - MAX_QUEUE_SIZE=2000
+    volumes:
+      - sqlite-data:/app/data
+    depends_on:
+      - redis
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  redis-data:
+  sqlite-data:
