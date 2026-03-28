@@ -21,12 +21,14 @@ export async function handleCompletion(
   req: Request,
   res: Response,
   body: ChatCompletionRequest,
+  signal: AbortSignal,
 ): Promise<TokenUsage | null> {
   const resolvedBody = await resolveImageUrls(body)
   const response = await fetch(OLLAMA_COMPLETIONS_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(resolvedBody),
+    signal,
   })
 
   if (!response.ok) {
@@ -59,6 +61,7 @@ export async function handleStreamingCompletion(
   req: Request,
   res: Response,
   body: ChatCompletionRequest,
+  signal: AbortSignal,
 ): Promise<TokenUsage | null> {
   const resolvedBody = await resolveImageUrls(body)
   const streamBody = { ...resolvedBody, stream_options: { include_usage: true } }
@@ -66,6 +69,7 @@ export async function handleStreamingCompletion(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(streamBody),
+    signal,
   })
 
   if (!response.ok) {

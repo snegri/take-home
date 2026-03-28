@@ -11,18 +11,20 @@ type CompletionHandler = (
   req: Request,
   res: Response,
   body: ChatCompletionRequest,
+  signal: AbortSignal,
 ) => Promise<TokenUsage | null>
 
 function proxyToOllama(
   req: Request,
   res: Response,
   body: ChatCompletionRequest,
+  signal: AbortSignal,
 ): () => Promise<TokenUsage | null> {
   const handler = (
     body.stream ? handleStreamingCompletion : handleCompletion
   ) satisfies CompletionHandler
 
-  return () => handler(req, res, body)
+  return () => handler(req, res, body, signal)
 }
 
 router.post("/v1/chat/completions", async (req: Request, res: Response) => {
@@ -44,6 +46,10 @@ router.post("/v1/chat/completions", async (req: Request, res: Response) => {
     body.max_tokens = 4096
   }
 
+  // Abort upstream fetch when client disconnects
+  const controller = new AbortController()
+  req.on("close", () => controller.abort())
+
   const { allowed } = await reserveTokens(user.id, body.max_tokens)
   if (!allowed) {
     res.status(429).json({
@@ -56,7 +62,7 @@ router.post("/v1/chat/completions", async (req: Request, res: Response) => {
 
   let usage
   try {
-    usage = await enqueueRequest(user.id, proxyToOllama(req, res, body))
+    usage = await enqueueRequest(user.id, proxyToOllama(req, res, body, controller.signal))
 
     if (usage) {
       await trackUsage(user.id, body.model, usage)
